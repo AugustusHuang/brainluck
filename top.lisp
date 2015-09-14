@@ -49,7 +49,7 @@
 			   i (1+ i)))))
 	      (#\<
 	       (if (zerop global-pointer)
-		   (error "Invalid operation.")
+		   (error "Invalid index.")
 		   (progn
 		     (decf global-pointer)
 		     (incf i))))
@@ -61,16 +61,16 @@
 		     (incf (aref global-array global-pointer))
 		     (incf i))))
 	      (#\-
-	       (if (zerop (aref global-array global-pointer))
-		   (error "Underflow.")
-		   (progn
-		     (decf (aref global-array global-pointer))
-		     (incf i))))
+	       (unless (zerop (aref global-array global-pointer))
+		 (decf (aref global-array global-pointer)))
+	       (incf i))
 	      (#\.
 	       (format t "~C" (code-char (aref global-array global-pointer)))
 	       (incf i))
 	      (#\,
-	       (setf (aref global-array global-pointer) (read-char)
+	       (setf (aref global-array global-pointer)
+		     ;; In SBCL the #\Newline is a problem.
+		     (char-code (read-char t nil #\Newline))
 		     i (1+ i)))
 	      (#\[
 	       (push i [-list)

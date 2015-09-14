@@ -1,3 +1,4 @@
+
 (defpackage :brainluck
   (:use :cl)
   (:documentation
@@ -9,5 +10,6 @@
 	:brainluck)
   (:documentation
    "Test package of Brainluck.")
-  (:export :hello-world
-	   :echo))
+  (:export :bf-hello-world
+	   :bf-echo
+	   :bf-reverse))

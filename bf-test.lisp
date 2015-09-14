@@ -1,7 +1,11 @@
+
 (in-package :brainluck-test)
 
-(defun test-hello-world ()
+(defun bf-hello-world ()
   (top-level "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."))
 
-(defun test-echo ()
-  (top-level))
+(defun bf-echo ()
+  (top-level ">+[[>],.----- ----- ---[+++++ +++++ +++[<]]>]<<[<]>>[.>]"))
+
+(defun bf-reverse ()
+  (top-level ",[>,]<[.<]"))
