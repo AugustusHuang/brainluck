@@ -9,17 +9,19 @@
       ;;; Global pointer, workes as the global brainfuck pointer,
       ;;; used as the index of the *GLOBAL-ARRAY*.
       (global-pointer 0))
-  (defun top-level ()
+  (defun top-level (&optional form)
     "The repl of Brainluck, Brainfuck interpreter in Common Lisp."
-    (loop
-       (format t "~&TOP> ")
-       (let ((line (string (read-line))))
-	 (cond ((string= line "clear")
-		(clear-array))
-	       ((string= line "exit")
-		(progn (clear-array) (return)))
-	       (t
-		(funcall #'evaluate line))))))
+    (if form
+	(funcall #'evaluate form)
+	(loop
+	   (format t "~&TOP> ")
+	   (let ((line (string (read-line))))
+	     (cond ((string= line "clear")
+		    (clear-array))
+		   ((string= line "exit")
+		    (progn (clear-array) (return)))
+		   (t
+		    (funcall #'evaluate line)))))))
 
   (defun clear-array ()
     (progn
