@@ -29,7 +29,8 @@
 ;;; Internal interpreter function. Every time eats an input char, and do
 ;;; corresponding actions.
   (defun evaluate (str)
-    (let ((i 0))
+    (let ((i 0)
+	  ([-list nil))
       (loop for len = (length str)
 	 while (/= i len)
 	 do (case (char str i)
@@ -64,23 +65,24 @@
 		     (decf (aref global-array global-pointer))
 		     (incf i))))
 	      (#\.
-	       (format t "~C~%"
-		       (code-char (aref global-array global-pointer)))
+	       (format t "~C" (code-char (aref global-array global-pointer)))
 	       (incf i))
 	      (#\,
 	       (setf (aref global-array global-pointer) (read-char)
 		     i (1+ i)))
 	      (#\[
+	       (push i [-list)
 	       (when (zerop (aref global-array global-pointer))
-		 ;; Expect the nearest ending ].
+		 ;; Expect the corresponding ending ].
 		 (loop while (not (char= (char str i) #\]))
 		      do (incf i)))
 	       (incf i))
 	      (#\]
-	       (when (not (zerop (aref global-array global-pointer)))
-		 ;; Expect the nearest starting [.
-		 (loop while (not (char= (char str i) #\[))
-		      do (decf i)))
-	       (incf i))
+	       (let (([-pos (pop [-list)))
+		 (when (not (zerop (aref global-array global-pointer)))
+		   ;; Expect the nearest starting [.
+		   (setf i [-pos)
+		   (push i [-list))
+		 (incf i)))
 	      (t
 	       (incf i)))))))
