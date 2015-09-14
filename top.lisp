@@ -50,7 +50,9 @@
 			   i (1+ i)))))
 	      (#\<
 	       (if (zerop global-pointer)
-		   (error "Reach the leftmost slot of the global array.")
+		   (progn
+		     (warn "Reach the leftmost slot of the global array.")
+		     (return))
 		   (progn
 		     (decf global-pointer)
 		     (incf i))))
