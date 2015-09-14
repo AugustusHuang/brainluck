@@ -4,15 +4,16 @@
 ;;; Top level REPL.
 (let (;;; Global array, workes as the global brainfuck infinite array,
       ;;; will double its size everytime to meet the program's need.
-      (global-array (make-array 1024 :element-type 'unsigned-byte
+      ;;; By default the size is 30K, like the common definition.
+      (global-array (make-array 32768 :element-type 'unsigned-byte
 				:initial-element 0 :adjustable t))
       ;;; Global pointer, workes as the global brainfuck pointer,
       ;;; used as the index of the *GLOBAL-ARRAY*.
       (global-pointer 0))
-  (defun top-level (&optional form)
+  (defun top-level (&optional (stream *standard-input*) form)
     "The repl of Brainluck, Brainfuck interpreter in Common Lisp."
     (if form
-	(funcall #'evaluate form)
+	(evaluate stream form)
 	(loop
 	   (format t "~&TOP> ")
 	   (let ((line (string (read-line))))
@@ -21,7 +22,7 @@
 		   ((string= line "exit")
 		    (progn (clear-array) (return)))
 		   (t
-		    (funcall #'evaluate line)))))))
+		    (evaluate stream line)))))))
 
   (defun clear-array ()
     (progn
@@ -30,7 +31,7 @@
       (setf global-pointer 0)))
 ;;; Internal interpreter function. Every time eats an input char, and do
 ;;; corresponding actions.
-  (defun evaluate (str)
+  (defun evaluate (stream str)
     (let ((i 0)
 	  ([-list nil))
       (loop for len = (length str)
@@ -49,7 +50,7 @@
 			   i (1+ i)))))
 	      (#\<
 	       (if (zerop global-pointer)
-		   (error "Invalid index.")
+		   (error "Reach the leftmost slot of the global array.")
 		   (progn
 		     (decf global-pointer)
 		     (incf i))))
@@ -69,8 +70,10 @@
 	       (incf i))
 	      (#\,
 	       (setf (aref global-array global-pointer)
-		     ;; In SBCL the #\Newline is a problem.
-		     (char-code (read-char t nil #\Newline))
+		     (let ((chara (read-char stream nil :eof)))
+		       (if (or (eql chara :eof) (char= chara #\Newline))
+			   0
+			   (char-code chara)))
 		     i (1+ i)))
 	      (#\[
 	       (push i [-list)
